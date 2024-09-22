@@ -37,7 +37,8 @@ class BookSearchForm(forms.Form):
         label="",
         widget=forms.TextInput(
             attrs={
-                "placeholder": "Search by title"
+                "placeholder": "Search by title",
+                "class": "form-control form-control-dark text-bg-dark"
             }
         )
     )

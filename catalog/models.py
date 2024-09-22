@@ -33,7 +33,7 @@ class Book(models.Model):
     price = models.DecimalField(max_digits=7, decimal_places=2)
     format = models.ForeignKey(LiteraryFormat, on_delete=models.CASCADE, related_name="books")
     authors = models.ManyToManyField(settings.AUTH_USER_MODEL)
-    image = CloudinaryField("image", null=True, blank=True)
+    image = models.ImageField(upload_to="labels", null=True, blank=True)
 
     class Meta:
         ordering = ("title",)

@@ -3,13 +3,86 @@
 <title>Home page</title>
 {% endblock %}
 {% block content %}
-<h1>Library Home</h1>
-<p>Welcome to the Greatest Library!</p>
-<h3>Library content:</h3>
-<ul>
-  <li>Num books: {{ num_books }}</li>
-  <li>Num authors: {{ num_authors }}</li>
-  <li>Num literary formats: {{ num_literary_formats }}</li>
-</ul>
- <p>You have visited this page {{ num_visits }} time{{num_visits|pluralize }}</p>
+<header class="bg-primary text-white text-center py-3">
+    <h1>Books</h1>
+</header>
+
+<div class="container-fluid mt-4">
+    <div class="d-flex">
+        <div class="col-md-2 me-3"> <!-- Добавьте отступ справа -->
+            <h2>Поиск по категориям</h2>
+            <form method="GET" action="{% url 'catalog:index' %}">
+                <div class="mb-3">
+                    <label for="category" class="form-label">Категория</label>
+                    <select name="category" id="category" class="form-select">
+                        <option value="">Все категории</option>
+                        <option value="category1">Категория 1</option>
+                        <option value="category2">Категория 2</option>
+                        <!-- Добавьте больше категорий по необходимости -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="format" class="form-label">Формат</label>
+                    <select name="format" id="format" class="form-select">
+                        <option value="">Все форматы</option>
+                        <option value="biography">biography</option>
+                        <option value="novel">novel </option>
+                        <!-- Добавьте больше форматов по необходимости -->
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Искать</button>
+            </form>
+        </div>
+
+        <div class="col-md-9">
+            <h2>Таблица данных</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Price</th>
+                        <th>Format</th>
+                        <th>Authors</th>
+                        <th>Заголовок 3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for book in book_list %}
+                    <tr>
+                        <td>{{ book.title }}</td>
+                        <td>{{ book.price }}</td>
+                        <td>{{ book.format }}</td>
+                        <td>{{ book.authors.all|join:", " }}</td>
+                        <td>Данные 3</td>
+                    </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">Нет книг</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% load query_transform %}
+  <ul class="pagination">
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page=1">First</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?{% query_transform request page=page_obj.previous_page_number %}">Prev</a>
+      </li>
+    {% endif %}
+    <li class="page-item active"><span class="page-link">{{ page_obj.number }} of {{ paginator.num_pages }}</span></li>
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?{% query_transform request page=page_obj.next_page_number %}">Next</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a>
+      </li>
+    {% endif %}
+  </ul>
+        </div>
+    </div>
+</div>
 {% endblock %}

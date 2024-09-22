@@ -1,6 +1,7 @@
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
@@ -12,6 +13,22 @@ from .models import Book, Author, LiteraryFormat
 
 @login_required
 def index(request: HttpRequest) -> HttpResponse:
+    book_list = Book.objects.all()
+    form = BookSearchForm(request.GET or None)
+    if form.is_valid():
+        book_list = book_list.filter(title__icontains=form.cleaned_data["title"])
+    book_format = request.GET.get("format")
+    if book_format:
+        book_list = book_list.filter(format__name=book_format)
+    paginate_by_str = request.GET.get("paginate_by", "5")
+    try:
+        paginate_by = int(paginate_by_str)
+    except ValueError:
+        paginate_by = 5
+    paginator = Paginator(book_list, paginate_by)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    books = paginator.get_page(page_number)
     num_books = Book.objects.count()
     num_authors = Author.objects.count()
     num_literary_formats = LiteraryFormat.objects.count()
@@ -21,7 +38,15 @@ def index(request: HttpRequest) -> HttpResponse:
         "num_books": num_books,
         "num_authors": num_authors,
         "num_literary_formats": num_literary_formats,
-        "num_visits": num_visits + 1
+        "num_visits": num_visits + 1,
+        "book_list_raw": book_list,
+        "form": form,
+        "page_obj": page_obj,
+        "paginate_by": paginate_by,
+        "book_list_list": page_obj.object_list,
+        "book_list": books,
+
+        "is_paginated": False
     }
     return render(request, "catalog/index.html", context=context)
 
@@ -239,3 +264,21 @@ class BookUpdateView(LoginRequiredMixin, generic.UpdateView):
 #         f"<h4>Unique number: {unique_number}</h4>"
 #         "</html>"
 #     )
+
+#
+# def index(request) -> HttpResponse:
+#     all = Movie.objects.all()
+#     paginate_by_str = request.GET.get("paginate_by", "5")
+#     try:
+#         paginate_by = int(paginate_by_str)
+#     except ValueError:
+#         paginate_by = 5
+#     paginator = Paginator(all, paginate_by)
+#     page_number = request.GET.get("page")
+#     page_obj = paginator.get_page(page_number)
+#     context = {
+#         "page_obj": page_obj,
+#         "paginate_by": paginate_by,
+#         "post_list": page_obj.object_list,
+#     }
+#     return render(request, "movies/index.html", context=context)
