@@ -1,0 +1,6 @@
+<li class="list-group-item">
+    <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-link p-0" style="text-decoration: none;">Logout</button>
+    </form>
+</li>

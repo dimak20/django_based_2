@@ -1,0 +1,9 @@
+  {% if bid_form.errors %}
+    <div style="color: red;">
+        {% for field, errors in bid_form.errors.items %}
+            {% for error in errors %}
+                <p>{{ field }}: {{ error }}</p>
+            {% endfor %}
+        {% endfor %}
+    </div>
+{% endif %}

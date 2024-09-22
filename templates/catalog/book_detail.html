@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Title: {{ book.title }}<a style="float:right" href="{% url 'catalog:book-update' pk=book.id %}">Edit</a></h1>
+  <p><strong>Format: </strong>{{ book.format.name }}</p>
+  <p><strong>Price: </strong>{{ book.price }}</p>
+  <div class="ml-3">
+    <h3>Authors:</h3>
+    {% for author in book.authors.all %}
+      <hr>
+      <p class="text-muted">{{ author.id }}</p>
+      <p>{{ author.first_name }} {{ author.last_name }}
+      {% if author.pseudonym %}
+        ({{ author.pseudonym }})
+      {% endif %}
+      </p>
+    {% empty %}
+      <p>No authors!</p>
+    {% endfor %}
+  </div>
+{% endblock %}
