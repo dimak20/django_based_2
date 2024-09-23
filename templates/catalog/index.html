@@ -39,7 +39,19 @@
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th>Title</th>
+                        <th class="border-bottom" scope="col">
+                    <a href="?sort_by=title&sort_dir={% if current_sort_by == 'title' and current_sort_dir == 'desc' %}asc{% else %}desc{% endif %}">
+                      Title
+                      <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 19.5L6 13.5H18L12 19.5Z"
+                              fill="{% if current_sort_by == 'name' and current_sort_dir == 'desc' %}currentColor{% else %}gray{% endif %}"
+                              class="sorting-alternate-up"></path>
+                        <path d="M12 4.5L18 10.5H6L12 4.5Z"
+                              fill="{% if current_sort_by == 'name' and current_sort_dir == 'asc' %}currentColor{% else %}gray{% endif %}"
+                              class="sorting-alternate-up"></path>
+                      </svg>
+                    </a>
+                  </th>
                         <th>Price</th>
                         <th>Format</th>
                         <th>Authors</th>
@@ -51,8 +63,12 @@
                     <tr>
                         <td>{{ book.title }}</td>
                         <td>{{ book.price }}</td>
+                      {% if book.format.name == "biography" %}
+                        <td class="table-success">{{ book.format }}</td>
+                      {% else %}
                         <td>{{ book.format }}</td>
-                        <td>{{ book.authors.all|join:", " }}</td>
+                      {% endif %}
+                      <td>{{ book.authors.all|join:", " }}</td>
                         <td>Данные 3</td>
                     </tr>
                 {% empty %}

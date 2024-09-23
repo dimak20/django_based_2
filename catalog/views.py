@@ -14,6 +14,13 @@ from .models import Book, Author, LiteraryFormat
 @login_required
 def index(request: HttpRequest) -> HttpResponse:
     book_list = Book.objects.all()
+    sort_by = request.GET.get('sort_by')  # Укажите колонку по умолчанию
+    if sort_by:
+        sort_dir = request.GET.get('sort_dir', 'asc')  # Направление сортировки
+        # Проверяем направление сортировки и составляем аргумент для order_by
+        if sort_dir == 'desc':
+            sort_by = f'-{sort_by}'
+            book_list = book_list.order_by(sort_by)
     form = BookSearchForm(request.GET or None)
     if form.is_valid():
         book_list = book_list.filter(title__icontains=form.cleaned_data["title"])
@@ -46,7 +53,9 @@ def index(request: HttpRequest) -> HttpResponse:
         "book_list_list": page_obj.object_list,
         "book_list": books,
 
-        "is_paginated": False
+        "is_paginated": False,
+        "current_sort_by": request.GET.get('sort_by', 'default_column'),
+        "current_sort_dir": request.GET.get('sort_dir', 'asc')
     }
     return render(request, "catalog/index.html", context=context)
 
