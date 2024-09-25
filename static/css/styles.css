@@ -1,19 +1,25 @@
-body {
-    margin-top: 20px;
-}
+/*body {*/
+/*    margin-top: 20px;*/
+/*}*/
 
-.sidebar-nav {
-    padding: 0;
-    list-style: none;
-}
-header {
-    margin: 0;
-    padding: 0;
-}
-body {
-    display: flex;
-    align-items: center; /* Вертикальное центрирование */
-    justify-content: center; /* Горизонтальное центрирование */
-    min-height: 100vh; /* Высота на весь экран */
-    text-align: center; /* Центрирование текста */
+/*.sidebar-nav {*/
+/*    padding: 0;*/
+/*    list-style: none;*/
+/*}*/
+/*header {*/
+/*    position: relative; !* Или absolute, если нужно фиксированное положение *!*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    width: 100%;*/
+/*}*/
+/*body {*/
+/*    display: flex;*/
+/*    align-items: center; !* Вертикальное центрирование *!*/
+/*    justify-content: center; !* Горизонтальное центрирование *!*/
+/*    min-height: 100vh; !* Высота на весь экран *!*/
+/*    text-align: center; !* Центрирование текста *!*/
+/*}*/
+.container-fluid, .col-sm-12 {
+    margin: 0 !important; /* Принудительно сбросить отступы */
+    padding: 0 !important; /* Принудительно сбросить внутренние отступы */
 }

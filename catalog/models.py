@@ -34,6 +34,7 @@ class Book(models.Model):
     format = models.ForeignKey(LiteraryFormat, on_delete=models.CASCADE, related_name="books")
     authors = models.ManyToManyField(settings.AUTH_USER_MODEL)
     image = models.ImageField(upload_to="labels", null=True, blank=True)
+    boolean = models.BooleanField(default=False)
 
     class Meta:
         ordering = ("title",)

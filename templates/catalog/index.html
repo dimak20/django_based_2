@@ -56,6 +56,7 @@
                         <th>Format</th>
                         <th>Authors</th>
                         <th>Заголовок 3</th>
+                        <th>Boolean</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,6 +71,7 @@
                       {% endif %}
                       <td>{{ book.authors.all|join:", " }}</td>
                         <td>Данные 3</td>
+                        <td><a href="{% url 'catalog:change' pk=book.id %}">{{ book.boolean }}</a></td>
                     </tr>
                 {% empty %}
                 <tr>

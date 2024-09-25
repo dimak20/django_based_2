@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 
@@ -52,12 +52,92 @@ def index(request: HttpRequest) -> HttpResponse:
         "paginate_by": paginate_by,
         "book_list_list": page_obj.object_list,
         "book_list": books,
-
-        "is_paginated": False,
         "current_sort_by": request.GET.get('sort_by', 'default_column'),
         "current_sort_dir": request.GET.get('sort_dir', 'asc')
     }
     return render(request, "catalog/index.html", context=context)
+
+@login_required
+def index2(request: HttpRequest) -> HttpResponse:
+    book_list = Book.objects.all()
+
+    # Используем сохранённые параметры из сессии, если они есть
+    search_query = request.session.get('search', '')
+    sort_by = request.session.get('sort_by', '')  # Укажите колонку по умолчанию
+    sort_dir = request.session.get('sort_dir', 'asc')  # Направление сортировки
+    paginate_by_str = request.session.get("paginate_by", "5")
+    page_number = request.GET.get("page")  # Из запроса
+
+    # Если передан поисковый запрос, фильтруем
+    if search_query:
+        book_list = book_list.filter(title__icontains=search_query)
+
+    # Обработка сортировки
+    if sort_by:
+        if sort_dir == 'desc':
+            sort_by = f'-{sort_by}'
+        book_list = book_list.order_by(sort_by)
+
+    # Обработка пагинации
+    try:
+        paginate_by = int(paginate_by_str)
+    except ValueError:
+        paginate_by = 5
+    paginator = Paginator(book_list, paginate_by)
+    page_obj = paginator.get_page(page_number)
+
+    # Остальные параметры
+    num_books = Book.objects.count()
+    num_authors = Author.objects.count()
+    num_literary_formats = LiteraryFormat.objects.count()
+    num_visits = request.session.get("num_visits", 0)
+    request.session["num_visits"] = num_visits + 1
+
+    context = {
+        "num_books": num_books,
+        "num_authors": num_authors,
+        "num_literary_formats": num_literary_formats,
+        "num_visits": num_visits + 1,
+        "form": BookSearchForm(initial={'title': search_query}),  # Передаем поисковый запрос в форму
+        "page_obj": page_obj,
+        "paginate_by": paginate_by,
+        "book_list": page_obj.object_list,
+        "is_paginated": False,
+        "current_sort_by": sort_by,
+        "current_sort_dir": sort_dir
+    }
+    return render(request, "catalog/index.html", context=context)
+
+
+@login_required
+def BookChangeView(request, pk: int):
+    book = get_object_or_404(Book, pk=pk)
+    book.boolean = not book.boolean
+    book.save()
+    return redirect("catalog:index")
+
+@login_required
+def BookChangeView2(request, pk: int):
+    book = get_object_or_404(Book, pk=pk)
+
+    # Сохраняем параметры поиска и пагинации в сессии
+    if request.GET.get('search'):
+        request.session['search'] = request.GET['search']
+    if request.GET.get('sort_by'):
+        request.session['sort_by'] = request.GET['sort_by']
+    if request.GET.get('sort_dir'):
+        request.session['sort_dir'] = request.GET['sort_dir']
+    if request.GET.get('page'):
+        request.session['page'] = request.GET['page']
+    if request.GET.get('paginate_by'):
+        request.session['paginate_by'] = request.GET['paginate_by']
+
+    # Изменяем состояние книги
+    book.boolean = not book.boolean
+    book.save()
+
+    # Перенаправляем на страницу индекса с параметрами
+    return redirect("catalog:index")
 
 
 class LiteraryFormatListView(LoginRequiredMixin, generic.ListView):

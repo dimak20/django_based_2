@@ -16,6 +16,7 @@ from catalog.views import (
     AuthorDetailView,
     BookCreateView,
     BookUpdateView,
+    BookChangeView,
 )
 
 urlpatterns = [
@@ -32,6 +33,7 @@ urlpatterns = [
     path("authors/<int:pk>/", AuthorDetailView.as_view(), name="author-detail"),
     path("books/create/", BookCreateView.as_view(), name="book-create"),
     path("books/<int:pk>/update/", BookUpdateView.as_view(), name="book-update"),
+    path("books/<int:pk>/change/", BookChangeView, name="change"),
 
 
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
